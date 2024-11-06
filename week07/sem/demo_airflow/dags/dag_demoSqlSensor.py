@@ -79,7 +79,7 @@ with DAG("mgcrp__demo_sql_sensor",
     sensor = SqlSensor(
         task_id="waiting_for_data",
         conn_id="postgres_master",
-        sql=sql_sensor_1.format(calc_date='{{ execution_date.date() }}'),
+        sql=sql_sensor_1.format(calc_date='{{ execution_date.strftime("%Y%m%d") }}'),
         timeout=7200,
         poke_interval=600,
         mode='reschedule'

@@ -107,7 +107,7 @@ with DAG("mgcrp__demo_python",
     sensor = SqlSensor(
         task_id="waiting_for_data",
         conn_id="postgres_master",
-        sql=sql_sensor_1.format(calc_date='{{ execution_date.date() }}'),
+        sql=sql_sensor_1.format(calc_date='{{ execution_date.strftime("%Y%m%d") }}'),
         timeout=7200,
         poke_interval=600,
         mode='reschedule'
@@ -134,7 +134,7 @@ with DAG("mgcrp__demo_python",
         task_id='send_telegram',
         op_kwargs={
             'channel_id': '-4085444246',
-            'text': 'Процесс {{ dag.dag_id }} за дату {{ execution_date.date() }} отработал!'
+            'text': 'Процесс {{ dag.dag_id }} за дату {{ execution_date.strftime("%Y%m%d") }} отработал!'
         }
     )
 

@@ -84,7 +84,7 @@ def task_fail_tg_alert(context):
     # ------------------- КОД ------------------
 
     log_url = context.get("task_instance").log_url
-    exception_text_short = "[Читать далее...]({})".format(log_url)
+    exception_text_short = "[Читать далее...]({}) - {}".format(log_url)
     task_id = context.get("task_instance").task_id
     dag_id = context.get("task_instance").dag_id
     dag_owner = context.get("dag").owner
@@ -151,7 +151,7 @@ with DAG("mgcrp__demo_python_fail",
     sensor = SqlSensor(
         task_id="waiting_for_data",
         conn_id="postgres_master",
-        sql=sql_sensor_1.format(calc_date='{{ execution_date.date() }}'),
+        sql=sql_sensor_1.format(calc_date='{{ execution_date.strftime("%Y%m%d") }}'),
         timeout=7200,
         poke_interval=600,
         mode='reschedule'
@@ -161,14 +161,14 @@ with DAG("mgcrp__demo_python_fail",
     task2 = PostgresOperator(
         task_id="drop_table",
         postgres_conn_id="postgres_master",
-        sql=sql_script_2.format(calc_date='{{ execution_date }}'),
+        sql=sql_script_2.format(calc_date='{{ execution_date.strftime("%Y%m%d") }}'),
     )
     
     # 3 - create table
     task3 = PostgresOperator(
         task_id="perform_etl",
         postgres_conn_id="postgres_master",
-        sql=sql_script_3.format(calc_date='{{ execution_date }}'),
+        sql=sql_script_3.format(calc_date='{{ execution_date.strftime("%Y%m%d") }}'),
     )
 
     # 4 - Run python
@@ -178,7 +178,7 @@ with DAG("mgcrp__demo_python_fail",
         task_id='send_telegram',
         op_kwargs={
             'channel_id': '-4085444246',
-            'text': 'Процесс {{ dag.dag_id }} за дату {{ execution_date.date() }} отработал!'
+            'text': 'Процесс `{{ dag.dag_id }}` за дату {{ execution_date.strftime("%Y%m%d") }} отработал!'
         }
     )
 
